@@ -1,2 +1,4 @@
 ﻿  main.c
-  Text_editor_Iryna_Aksonkina.vcxproj -> C:\Users\User\source\repos\Text_editor_Iryna_Aksonkina\x64\Debug\Text_editor_Iryna_Aksonkina.exe
+C:\Users\User\source\repos\Text_editor_Iryna_Aksonkina\main.c(22,43): warning C4305: '=': truncation from 'int' to 'char'
+MSVCRTD.lib(exe_main.obj) : error LNK2019: unresolved external symbol main referenced in function "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
+C:\Users\User\source\repos\Text_editor_Iryna_Aksonkina\x64\Debug\Text_editor_Iryna_Aksonkina.exe : fatal error LNK1120: 1 unresolved externals
