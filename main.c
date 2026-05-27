@@ -1,7 +1,6 @@
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#pragma execution_character_set("utf-8")
 
 typedef struct {
     char** text;
@@ -29,7 +28,7 @@ void start_new_line(TextEditor* editor) {
 
 void print_text(TextEditor* editor) {
     if (editor->line_count == 0) {
-        printf("Текст порожній\n");
+        printf("Buffer is empty\n");
         return;
     }
 
@@ -91,14 +90,14 @@ void save_to_file(TextEditor* editor, const char* filename) {
     }
 
     fclose(file);
-    printf("Текст збережено успішно\n");
+    printf("Text saved \n");
 }
 
 
 void load_from_file(TextEditor* editor, const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
-        printf("Файл не знайдений\n");
+        printf("file not found\n");
         return;
     }
 
@@ -121,19 +120,19 @@ void load_from_file(TextEditor* editor, const char* filename) {
     }
 
     fclose(file);
-    printf("Текст завантажено\n");
+    printf("Text loaded\n");
 }
 
 void insert_text(TextEditor* editor, int line_indx, int col_indx, const char* new_text) {
     if (line_indx < 0 || line_indx >= editor->line_count) {
-        printf("Рядка не існує");
+        printf("line does not exist\n");
         return;
     }
 
     int old_len = editor->line_lengths[line_indx];
 
     if (col_indx < 0 || col_indx > old_len) {
-        printf("Не існує такої довжини \n");
+        printf("position does not exist \n");
         return;
     }
 
@@ -144,7 +143,7 @@ void insert_text(TextEditor* editor, int line_indx, int col_indx, const char* ne
 
     int new_len = old_len + insert_len;
 
-    editor->text[line_indx] = realloc(editor->text[line_indx], (new_len + 1) + sizeof(char));
+    editor->text[line_indx] = realloc(editor->text[line_indx], (new_len + 1) * sizeof(char));
 
     for (int i = old_len; i >= col_indx; i--) {
         editor->text[line_indx][i + insert_len] = editor->text[line_indx][i];
@@ -152,14 +151,58 @@ void insert_text(TextEditor* editor, int line_indx, int col_indx, const char* ne
     }
 
     for (int i = 0; i < insert_len; i++) {
-        editor->text[line_indx][col_indx + 1] = new_text[i];
+        editor->text[line_indx][col_indx + i] = new_text[i];
 
     }
 
     editor->line_lengths[line_indx] = new_len;
-    printf("Вставлено текст \n");
+    printf("Text inserted \n");
 
 
+}
+
+
+void search_text(TextEditor* editor, const char* pattern) {
+    int found = 0;
+    int pat_len = 0;
+    while (pattern[pat_len] != '\0') {
+        pat_len++;
+    }
+
+    for (int i = 0; i < editor->line_count; i++) {
+        int line_len = editor->line_lengths[i];
+
+        for (int j = 0; j <= line_len - pat_len; j++) {
+            int match = 1;
+            for (int k = 0; k < pat_len; k++) {
+                if (editor->text[i][j + k] != pattern[k]) {
+                    match = 0;
+                    break;
+                }
+            }
+            if (match) {
+                printf("Text found at position: %d %d\n", i, j);
+                found = 1;
+            }
+        }
+    }
+
+    if (!found) {
+        printf("Text not found\n");
+    }
+}
+
+
+
+int find_newline_index(const char* str) {
+    int i = 0;
+    while (str[i] != '\0') {
+        if (str[i] == '\n') {
+            return i;
+        }
+        i++;
+    }
+    return i;
 }
 
 
@@ -171,59 +214,73 @@ int main() {
     char buffer[256];
 
     do {
-        printf("\nТекстовий редактор\n");
-        printf("1.Додати текст у поточний рядок\n");
-        printf("2.Почати новий рядок\n");
-        printf("3.Вивести весь текст\n");
-        printf("4.Зберегти у файл\n");
-        printf("5.Завантажити з файлу\n");
-        printf("6.Вставити текст за індексом\n");
-        printf("7.Пошук тексту\n");
-        printf("8.Очистити консоль\n");
-        printf("0.Вихід\n");
-        printf("Оберіть дію: ");
+        printf("\nText Editor\n");
+        printf("1.Append text to current line\n");
+        printf("2.Start new line\n");
+        printf("3.Print all text\n");
+        printf("4.Save to file\n");
+        printf("5.Load from file\n");
+        printf("6.Insert text at position\n");
+        printf("7.Search text\n");
+        printf("8.Clear console\n");
+        printf("0.Exit\n");
+        printf("Choose action: ");
 
         scanf("%d", &choice);
         getchar();
 
         if (choice == 1) {
-            printf("Введіть текст для додавання: ");
+            printf("Enter text to append: ");
             fgets(buffer, sizeof(buffer), stdin);
-            buffer[strcspn(buffer, "\n")] = '\0';
+            buffer[find_newline_index(buffer)] = '\0';
             append_to_current_line(&editor, buffer);
         }
         else if (choice == 2) {
             start_new_line(&editor);
-            printf("Створено новий рядок.\n");
+            printf("New line started\n");
         }
         else if (choice == 3) {
-            printf("\nВаш текст:\n");
+            printf("\nYour text:\n");
             print_text(&editor);
         }
         else if (choice == 4) {
-            printf("Введіть назву файлу для збереження: ");
-            
+            printf("Enter file name to save: ");
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[find_newline_index(buffer)] = '\0';
+            save_to_file(&editor, buffer);
         }
         else if (choice == 5) {
-            printf("Введіть назву файлу для завантаження: ");
+            printf("Enter file name to load: ");
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[find_newline_index(buffer)] = '\0';
+            load_from_file(&editor, buffer);
             
         }
         else if (choice == 6) {
-            
+            int line_indx, col_indx;
+            printf("Enter line and position (space between): ");
+            scanf("%d %d", &line_indx, &col_indx);
+            getchar();
+            printf("Enter text to insert: ");
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[find_newline_index(buffer)] = '\0';
+            insert_text(&editor, line_indx, col_indx, buffer);
 
         }
         else if (choice == 7) {
-            printf("Введіть текст для пошуку: ");
-            
+            printf("Enter text to search: ");
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[find_newline_index(buffer)] = '\0';
+            search_text(&editor, buffer);
         }
         else if (choice == 8) {
             system("cls");
         }
         else if (choice == 0) {
-            printf("Дякуємо, що використали наш редактор\n");
+            printf("Thank you for using the editor\n");
         }
         else {
-            printf("Неправильний вибір\n");
+            printf("Wrong choice\n");
         }
 
     } while (choice != 0);
