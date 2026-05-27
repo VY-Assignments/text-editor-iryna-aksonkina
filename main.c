@@ -124,6 +124,44 @@ void load_from_file(TextEditor* editor, const char* filename) {
     printf("Текст завантажено\n");
 }
 
+void insert_text(TextEditor* editor, int line_indx, int col_indx, const char* new_text) {
+    if (line_indx < 0 || line_indx >= editor->line_count) {
+        printf("Рядка не існує");
+        return;
+    }
+
+    int old_len = editor->line_lengths[line_indx];
+
+    if (col_indx < 0 || col_indx > old_len) {
+        printf("Не існує такої довжини \n");
+        return;
+    }
+
+    int insert_len = 0;
+    while (new_text[insert_len] != '\0') {
+        insert_len++;
+    }
+
+    int new_len = old_len + insert_len;
+
+    editor->text[line_indx] = realloc(editor->text[line_indx], (new_len + 1) + sizeof(char));
+
+    for (int i = old_len; i >= col_indx; i--) {
+        editor->text[line_indx][i + insert_len] = editor->text[line_indx][i];
+
+    }
+
+    for (int i = 0; i < insert_len; i++) {
+        editor->text[line_indx][col_indx + 1] = new_text[i];
+
+    }
+
+    editor->line_lengths[line_indx] = new_len;
+    printf("Вставлено текст \n");
+
+
+}
+
 
 int main() {
     TextEditor editor;
