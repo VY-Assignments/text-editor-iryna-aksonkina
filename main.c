@@ -124,3 +124,73 @@ void load_from_file(TextEditor* editor, const char* filename) {
     printf("Текст завантажено\n");
 }
 
+
+int main() {
+    TextEditor editor;
+    init_editor(&editor);
+
+    int choice;
+    char buffer[256];
+
+    do {
+        printf("\nТекстовий редактор\n");
+        printf("1.Додати текст у поточний рядок\n");
+        printf("2.Почати новий рядок\n");
+        printf("3.Вивести весь текст\n");
+        printf("4.Зберегти у файл\n");
+        printf("5.Завантажити з файлу\n");
+        printf("6.Вставити текст за індексом\n");
+        printf("7.Пошук тексту\n");
+        printf("8.Очистити консоль\n");
+        printf("0.Вихід\n");
+        printf("Оберіть дію: ");
+
+        scanf("%d", &choice);
+        getchar();
+
+        if (choice == 1) {
+            printf("Введіть текст для додавання: ");
+            fgets(buffer, sizeof(buffer), stdin);
+            buffer[strcspn(buffer, "\n")] = '\0';
+            append_to_current_line(&editor, buffer);
+        }
+        else if (choice == 2) {
+            start_new_line(&editor);
+            printf("Створено новий рядок.\n");
+        }
+        else if (choice == 3) {
+            printf("\nВаш текст:\n");
+            print_text(&editor);
+        }
+        else if (choice == 4) {
+            printf("Введіть назву файлу для збереження: ");
+            
+        }
+        else if (choice == 5) {
+            printf("Введіть назву файлу для завантаження: ");
+            
+        }
+        else if (choice == 6) {
+            
+
+        }
+        else if (choice == 7) {
+            printf("Введіть текст для пошуку: ");
+            
+        }
+        else if (choice == 8) {
+            system("cls");
+        }
+        else if (choice == 0) {
+            printf("Дякуємо, що використали наш редактор\n");
+        }
+        else {
+            printf("Неправильний вибір\n");
+        }
+
+    } while (choice != 0);
+
+    clear_editor(&editor);
+
+    return 0;
+}
